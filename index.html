@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LPSL Professional Quotation Maker</title>
+<style>
+:root{--blue:#17365d;--blue2:#1f4e79;--light:#eef3f8;--line:#7f8c99;--danger:#a61b1b;--green:#176b45;--text:#1f1f1f}
+*{box-sizing:border-box} body{margin:0;background:#e8edf2;font-family:Arial,Helvetica,sans-serif;color:var(--text)}
+button,input,textarea,select{font:inherit}
+.appbar{position:sticky;top:0;z-index:20;background:#0e3155;color:#fff;padding:12px 18px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;box-shadow:0 2px 8px #0003}
+.appbar h1{font-size:18px;margin:0 18px 0 0}.appbar .spacer{flex:1}
+.btn{border:0;border-radius:6px;padding:9px 13px;cursor:pointer;font-weight:700}.primary{background:#fff;color:#0e3155}.green{background:#0b8a53;color:#fff}.red{background:#b42318;color:#fff}.gray{background:#64748b;color:#fff}
+.workspace{max-width:1500px;margin:18px auto;padding:0 14px}.paper{background:#fff;padding:10mm 9mm;box-shadow:0 3px 18px #0002;width:210mm;min-height:297mm;margin:auto;color:#1f1f1f}
+.toolbar{background:#fff;padding:12px;border-radius:8px;margin-bottom:14px;box-shadow:0 2px 8px #0001}
+.toolbar-grid{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:8px}.toolbar label,.field label{font-size:11px;font-weight:700;color:#475569;display:block;margin-bottom:3px}
+input,textarea,select{width:100%;border:1px solid #aab7c4;border-radius:4px;padding:6px;background:#fff}
+textarea{min-height:58px;resize:vertical}.header{display:grid;grid-template-columns:1fr 2fr 1fr;gap:12px;align-items:start;border-bottom:2px solid var(--blue);padding-bottom:7px}.logo-box{border:1px dashed #8da0b2;min-height:100px;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px}.logo-box img{max-width:100%;max-height:95px}
+.company{text-align:center}.company h2{margin:0;font-size:21px;color:var(--blue);letter-spacing:.2px}.company p{margin:4px 0;font-size:12px;line-height:1.35}.doc-title{text-align:right}.doc-title h1{margin:0 0 7px;color:var(--blue);font-size:21px;letter-spacing:.5px}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:7px}.meta .field{display:grid;grid-template-columns:92px 1fr;align-items:center}.meta label{margin:0}
+.customer{margin-top:10px;border:1px solid #333;padding:8px}.customer-grid{display:grid;grid-template-columns:2fr 1fr;gap:8px}.subject{margin:9px 0;font-weight:700;color:#17365d}.editable{background:#fffbe8}
+.table-wrap{overflow-x:auto;margin-top:8px}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border:1px solid #333;padding:4px 3px;vertical-align:middle}th{background:#d9e2f3;color:#17365d;text-align:center;font-size:9px;font-weight:700}td input{border:0;padding:2px;background:transparent;border-radius:0;font-size:10px}td input:focus{outline:1px solid #7195b5;background:#fff}.num{text-align:center;width:35px}.qty,.weight,.price,.total{text-align:right}.desc{min-width:170px}.part{min-width:120px}.unit{min-width:55px}.xcol{width:28px;text-align:center}.del{border:0;background:#fff;color:#b42318;font-size:17px;font-weight:900;cursor:pointer}
+.addrow{margin:8px 0}.summary{margin-top:10px;margin-left:auto;width:430px;max-width:100%}.sumrow{display:grid;grid-template-columns:1fr 150px;border:1px solid #333;border-bottom:0}.sumrow:last-child{border-bottom:1px solid #333}.sumrow b,.sumrow span{padding:6px}.sumrow span{text-align:right}.words{font-weight:700;margin-top:8px}.section-title{background:#d9e2f3;border:1px solid #333;padding:5px;font-weight:700;margin-top:10px;color:#17365d;letter-spacing:.15px}.terms{border:1px solid #333;padding:8px}.term-row{display:flex;gap:6px;margin:4px 0}.term-row input{flex:1}.term-del{border:0;background:#fff;color:#b42318;font-weight:900}.signatures{display:grid;grid-template-columns:1fr 1fr;gap:35px;margin-top:50px}.sig{border-top:1px solid #222;padding-top:7px;min-height:65px}.small{font-size:10px;color:#475569}
+@media(max-width:900px){.toolbar-grid{grid-template-columns:repeat(2,1fr)}.header{grid-template-columns:1fr}.doc-title{text-align:left}.customer-grid{grid-template-columns:1fr}.paper{padding:12mm 7mm}}
+@media print{
+ @page{size:A4 portrait;margin:8mm}.appbar,.toolbar,.no-print{display:none!important}body{background:#fff}.workspace{margin:0;padding:0}.paper{box-shadow:none;padding:0;width:194mm;min-height:281mm;margin:0 auto}.editable{background:#fff!important}input,textarea{color:#000}
+ table{font-size:7.5px}th{font-size:7px}td input{font-size:8px;padding:1px}.del,.xcol{display:none!important}.desc{min-width:0}.part{min-width:0}
+}
+@media print{
+ html,body{width:210mm;background:#fff}
+ body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .paper{overflow:visible}
+ .section-title,th{ -webkit-print-color-adjust:exact;print-color-adjust:exact}
+ input,textarea{font-family:Arial,Helvetica,sans-serif}
+}
+</style>
+</head>
+<body>
+<div class="appbar no-print">
+ <h1>LPSL Quotation Maker</h1>
+ <button class="btn primary" onclick="newQuotation()">New</button>
+ <button class="btn green" onclick="saveData()">Save</button>
+ <button class="btn gray" onclick="loadData()">Load</button>
+ <button class="btn primary" onclick="window.print()">Print / Save PDF</button>
+ <button class="btn red" onclick="clearAll()">Clear</button>
+ <span class="spacer"></span>
+ <span>Currency:</span>
+ <select id="currency" onchange="renderAll()"><option>EUR</option><option>BDT</option></select>
+ <label style="font-size:12px">1 EUR = <input id="rate" value="130" style="width:70px;color:#111" oninput="renderAll()"> BDT</label>
+</div>
+
+<div class="workspace">
+<div class="toolbar no-print">
+ <div class="toolbar-grid">
+  <div><label>Quotation No</label><input id="qno"></div>
+  <div><label>Date</label><input id="date" type="date"></div>
+  <div><label>Brand</label><input id="brand"></div>
+  <div><label>Model</label><input id="model"></div>
+  <div><label>Unit</label><input id="unit"></div>
+  <div><label>R/H</label><input id="rh"></div>
+  <div><label>Company Name</label><input id="company"></div>
+  <div><label>Customer Name</label><input id="customerName"></div>
+  <div><label>Customer Address</label><textarea id="customerAddress"></textarea></div>
+  <div><label>Subject</label><input id="subject"></div>
+  <div><label>Company Email / Phone</label><input id="companyContact"></div>
+  <div><label>Logo</label><input id="logoFile" type="file" accept="image/*" onchange="loadLogo(event)"></div>
+ </div>
+</div>
+
+<div class="paper" id="paper">
+ <div class="header">
+  <div class="logo-box"><img id="logo" alt="Company Logo"><span id="logoPlaceholder">YOUR LOGO</span></div>
+  <div class="company">
+   <h2 id="companyView">LIMBURG POWER SOLUTIONS LTD.</h2>
+   <p id="companyContactView">Professional Generator & Engine Solutions</p>
+   <p>Quotation / Commercial Offer</p>
+  </div>
+  <div class="doc-title">
+   <h1>QUOTATION</h1>
+   <div class="meta">
+    <div class="field"><label>No:</label><input id="qnoView"></div>
+    <div class="field"><label>Date:</label><input id="dateView" type="date"></div>
+    <div class="field"><label>Brand:</label><input id="brandView"></div>
+    <div class="field"><label>Model:</label><input id="modelView"></div>
+    <div class="field"><label>Unit:</label><input id="unitView"></div>
+    <div class="field"><label>R/H:</label><input id="rhView"></div>
+   </div>
+  </div>
+ </div>
+
+ <div class="customer">
+  <b>TO:</b>
+  <div class="customer-grid">
+   <div><input id="customerNameView" class="editable"><textarea id="customerAddressView" class="editable"></textarea></div>
+   <div class="small">Dear Sir/Madam,<br><br>Please find our quotation for the required items/services.</div>
+  </div>
+ </div>
+ <div class="subject">Subject: <input id="subjectView" class="editable" style="width:80%;font-weight:700"></div>
+
+ <div class="section-title">SPARE PARTS / ITEMS</div>
+ <div class="table-wrap">
+ <table id="itemsTable">
+  <thead><tr>
+   <th class="num">S/L</th><th class="desc">DESCRIPTION</th><th class="part">PART NO</th><th>QTY</th><th class="unit">UNIT</th><th>UNIT WEIGHT<br>(KG)</th><th>TOTAL WEIGHT<br>(KG)</th><th>UNIT PRICE<br>(<span class="curLabel">EUR</span>)</th><th>TOTAL PRICE<br>(<span class="curLabel">EUR</span>)</th><th class="xcol no-print">×</th>
+  </tr></thead>
+  <tbody id="itemsBody"></tbody>
+ </table>
+ </div>
+ <div class="addrow no-print"><button class="btn green" onclick="addItem()">+ Add Item</button></div>
+
+ <div class="summary">
+  <div class="sumrow"><b>SUB-TOTAL IN <span class="curLabel">EUR</span></b><span id="subtotal">0.00</span></div>
+  <div class="sumrow"><b>FREIGHT / OTHER CHARGE</b><span><input id="freight" type="number" value="0" step="0.01" oninput="renderAll()" style="text-align:right"></span></div>
+  <div class="sumrow"><b>TOTAL PRICE IN <span class="curLabel">EUR</span></b><span id="grandtotal">0.00</span></div>
+ </div>
+ <div class="words">IN WORD: <span id="words">ZERO ONLY.</span></div>
+
+ <div class="section-title">SERVICES / BDT ITEMS</div>
+ <div class="table-wrap">
+ <table><thead><tr><th class="num">S/L</th><th>DESCRIPTION</th><th>QTY</th><th>UNIT</th><th>UNIT PRICE (BDT)</th><th>TOTAL PRICE (BDT)</th><th class="xcol no-print">×</th></tr></thead>
+ <tbody id="bdtBody"></tbody></table>
+ </div>
+ <div class="addrow no-print"><button class="btn green" onclick="addBDT()">+ Add BDT Item</button></div>
+ <div class="summary">
+  <div class="sumrow"><b>SUB-TOTAL IN BDT</b><span id="bdtSubtotal">0.00</span></div>
+  <div class="sumrow"><b>TOTAL PRICE IN BDT</b><span id="bdtTotal">0.00</span></div>
+ </div>
+ <div class="words">IN WORD: BDT. <span id="bdtWords">ZERO ONLY.</span></div>
+
+ <div class="section-title">TERMS & CONDITIONS</div>
+ <div class="terms" id="terms"></div>
+ <div class="addrow no-print"><button class="btn green" onclick="addTerm()">+ Add Term</button></div>
+
+ <div class="signatures">
+  <div class="sig"><b>For, <span id="signCompany">LIMBURG POWER SOLUTIONS LTD.</span></b><br><br><br><span id="sign1">Authorized Representative</span></div>
+  <div class="sig"><b>&nbsp;</b><br><br><br><span id="sign2">Authorized Representative</span></div>
+ </div>
+ <div class="small" style="margin-top:15px">This quotation is system-generated and fully editable before printing.</div>
+</div>
+</div>
+
+<script>
+const seedItems = [
+["GASKET","12515572",1,"PCS",0.15,94.19],["GASKET","12302184",8,"PCS",0.05,11.80],["GASKET PAPER","12307445",1,"PCS",0.08,37.42],["GASKET","12453414",1,"PCS",0.22,138.71],["ROT. SHAFT LIP SEAL","12029427",1,"PCS",0.45,215.52],["PISTON","12420394",16,"PCS",8.50,1400],["CYLINDER LINER","12454750",16,"PCS",24.50,350],["ROUND SEALING RING","1183301",48,"PCS",0.02,11.61],["SET OF PISTON RING","12420394",16,"SET",0.35,220],["THRUST BEARING","12302034",2,"PCS",0.60,230],["SCREW/BOLT","12420719",10,"PCS",0.12,34.84],["SLIP RING","12137125",1,"PCS",0.50,395.20],["MAIN BEARING","12452207",9,"PCS",1.10,490],["BIG END BOLT","12420648",32,"PCS",0.25,19.35],["PLAIN WASHER","12420649",32,"PCS",0.03,4.20],["SMALL END BEARING","12307496",4,"PCS",0.40,270.97],["BIG END BEARING","12420916",8,"SET",0.65,490],["EXHAUST VALVE","12452424/12454246",32,"PCS",0.35,72.90],["INLET VALVE","12420827",4,"PCS",0.33,70.97],["VALVE ROTATOR","12032859",64,"PCS",0.28,27.10],["VALV.SPRING RETAIN","12028029",64,"PCS",0.15,9.03],["VALVE COLLET","12141698",64,"PCS",0.01,1.94],["VALVE COLLET","12030159",64,"PCS",0.01,1.94],["VALVE SPRING","12134406",64,"PCS",0.10,6.45],["VALVE SEAT INSERT","12420810",32,"PCS",0.18,103.23],["VALVE SEAT INSERT","12420843",32,"PCS",0.16,90],["VALVE GUIDE","12454373",32,"PCS",0.12,16.13],["VALVE GUIDE","12454372",32,"PCS",0.11,16.13],["SLEEVE","12300521",4,"Nos",0.75,195],["VALVE TAPPET","12136975",6,"PCS",0.90,119.35],["CLEVIS PIN","12302354",4,"PCS",0.05,32.26],["PLAIN WASHER","12302363",4,"PCS",0.02,19.35],["DISC SPRING","1144487",24,"PCS",0.01,1.94],["GASKET","12028085",1,"PCS",0.04,25.81],["GASKET","12028087",1,"PCS",0.05,33.55],["GASKET","12028088",1,"PCS",0.06,37.42],["GASKET","12028089",2,"PCS",0.08,58.06],["O-RING","12211071",1,"PCS",0.01,6.13],["O-RING","12211072",1,"PCS",0.01,9.03],["ROD END","12027535",1,"PCS",0.15,48.39],["ROD END","1177806",1,"PCS",0.15,48.39],["PIPE UNION","1178000",2,"PCS",0.30,151.61],["PIPE UNION","1162233",1,"PCS",0.25,90.32],["CLIP","12453988",8,"PCS",0.05,70.97],["COMPENSATOR","12454958",4,"Nos",1.40,290.32],["GASKET","12304040",1,"PCS",0.12,90.32],["GASKET","12141952",2,"PCS",0.05,22.58],["GASKET","12141953",2,"PCS",0.06,22.58],["ADJUSTING SCREW","12028031",32,"PCS",0.08,10.97],["HEXAGON NUT","1113158",32,"PCS",0.02,1.94],["ROUND SEALING RING","12523971/01153878",1,"PCS",0.01,3.23],["O-SEAL","1153845",4,"PCS",0.01,2.58],["FLANGE GASKET","1157753",4,"PCS",0.02,1.94],["O-SEAL","6214769",2,"PCS",0.01,2.58],["O-SEAL","1163400",4,"PCS",0.01,7.74],["O-SEAL","1166170",14,"PCS",0.01,9.68],["ROUND FLANG.GASKET","12140788",2,"PCS",0.03,9.68],["FLANGE GASKET","1167556",2,"PCS",0.04,9.35],["O-SEAL","1180772",1,"PCS",0.01,7.94],["FLANGE GASKET","1222928",1,"PCS",0.02,8.71],["GASKET","12300608",1,"PCS",0.04,13.55],["ROUND SEALING RING","1174503",2,"PCS",0.02,7.74],["ROUND SEALING RING","1175877",2,"PCS",0.02,4.19],["GASKET","12300671",1,"PCS",0.04,14.84],["GASKET","12304084",4,"PCS",0.08,32.26],["GASKET SET ASS08","12211586",16,"SET",1.20,204.50],["GASKET SET ASS15","12211901",1,"SET",0.85,258.06],["GASKET","12305008",12,"PCS",0.04,15.81],["SCREW/BOLT","12030750",16,"PCS",0.06,8.39],["GASKET","12300243",1,"PCS",0.15,106.45],["HEXAGON BOLT","1143189",4,"PCS",0.05,11.61],["HEXAGON NUT","1143195",4,"PCS",0.01,1.16],["O-SEAL","1212509",1,"PCS",0.01,1.94],["O-SEAL","1173586",1,"PCS",0.01,14.84],["ROUND FLANGE GASKET","12301728",1,"PCS",0.08,20.65],["ROUND SEALING RING","1181165",1,"PCS",0.02,11.61],["GASKET","12302352",2,"PCS",0.10,52.26],["HEXAGON NUT","1151573",12,"PCS",0.02,5.81],["O-SEAL","1153814",1,"PCS",0.01,3.55],["GASKET PAPER","12302404",8,"PCS",0.04,13.55],["ROUND SEALING RING","12524015/01177727",12,"PCS",0.01,5.48],["CHEES HEAD SCREW","1151503",48,"PCS",0.03,2.90],["PLAIN WASHER","1107548",48,"PCS",0.01,1.94],["O-SEAL","1160620",1,"PCS",0.01,3.87],["REPAIR KIT","12211180",1,"PCS",0.50,451.61],["BEARING BUSH","12453511",4,"PCS",0.15,77.42],["BEARING BUSH","12027626",1,"PCS",0.12,48.39],["O-SEAL","1153923",12,"PCS",0.01,5.16],["O-SEAL","1153807",2,"PCS",0.01,4.52],["O-SEAL","1151135",1,"PCS",0.01,8.71],["O-SEAL","1176819",1,"PCS",0.01,4.19],["O-SEAL","1171113",7,"PCS",0.01,4.19],["O-SEAL","1176807",3,"PCS",0.01,2.90],["FLANGE GASKET","1222933",1,"PCS",0.02,4.84],["O-SEAL","1180993",32,"PCS",0.01,2.58],["ADJUSTING SCREW","12030195",4,"PCS",0.08,22.54],["HEXAGON NUT","12030196",4,"PCS",0.02,10.20]
+];
+let items=seedItems.map(x=>({d:x[0],p:x[1],q:x[2],u:x[3],w:x[4],price:x[5]}));
+let bdtItems=[{d:"MAJOR OVERHAULING (E-70) SERVICE CHARGE",q:1,u:"JOB",price:250000},{d:"TURBOCHARGER SERVICE AND DYNAMIC BALANCING",q:1,u:"JOB",price:80000}];
+let terms=["Delivery Time : 03 to 04 weeks.","Payment Terms : 100% irrevocable L/C at sight (payment should be made at the time of releasing the bank documents).","Port of shipment : Any European Airport.","Port of discharge : Dhaka airport in Bangladesh.","Offer Validity : 30 days from the date hereon subjected to prior sales.","Partial shipment : Not allow.","Transshipment : Allow."];
+
+const $=id=>document.getElementById(id);
+function esc(s){return String(s??"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function money(n){return Number(n||0).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function numWords(n){
+ n=Math.round(Number(n)||0); if(n===0)return"ZERO";
+ const a=["","ONE","TWO","THREE","FOUR","FIVE","SIX","SEVEN","EIGHT","NINE","TEN","ELEVEN","TWELVE","THIRTEEN","FOURTEEN","FIFTEEN","SIXTEEN","SEVENTEEN","EIGHTEEN","NINETEEN"],b=["","","TWENTY","THIRTY","FORTY","FIFTY","SIXTY","SEVENTY","EIGHTY","NINETY"];
+ const under=x=>x<20?a[x]:b[Math.floor(x/10)]+(x%10?"-"+a[x%10]:"");
+ const group=(x)=>{let s="";if(x>=100){s+=a[Math.floor(x/100)]+" HUNDRED ";x%=100}if(x)s+=under(x);return s.trim()};
+ let out="";if(n>=1e9){out+=group(Math.floor(n/1e9))+" BILLION ";n%=1e9}if(n>=1e6){out+=group(Math.floor(n/1e6))+" MILLION ";n%=1e6}if(n>=1000){out+=group(Math.floor(n/1000))+" THOUSAND ";n%=1000}out+=group(n);return out.trim();
+}
+function syncTop(){
+ ["qno","date","brand","model","unit","rh"].forEach(k=>{ $(k+"View").value=$(k).value; });
+ $("companyView").textContent=$("company").value||"LIMBURG POWER SOLUTIONS LTD.";
+ $("companyContactView").textContent=$("companyContact").value||"Professional Generator & Engine Solutions";
+ $("customerNameView").value=$("customerName").value;$("customerAddressView").value=$("customerAddress").value;$("subjectView").value=$("subject").value;
+ $("signCompany").textContent=$("company").value||"LIMBURG POWER SOLUTIONS LTD.";
+}
+function renderItems(){
+ const cur=$("currency").value, rate=Number($("rate").value)||1;
+ $("itemsBody").innerHTML=items.map((x,i)=>`<tr>
+ <td class="num">${i+1}</td><td><input value="${esc(x.d)}" onchange="items[${i}].d=this.value"></td><td><input value="${esc(x.p)}" onchange="items[${i}].p=this.value"></td>
+ <td><input type="number" value="${x.q}" min="0" step="any" onchange="items[${i}].q=this.value"></td><td><input value="${esc(x.u)}" onchange="items[${i}].u=this.value"></td>
+ <td><input class="weight" type="number" value="${x.w}" min="0" step="any" onchange="items[${i}].w=this.value"></td><td class="total">${money(Number(x.q)*Number(x.w))}</td>
+ <td><input class="price" type="number" value="${x.price}" min="0" step="0.01" onchange="items[${i}].price=this.value"></td>
+ <td class="total">${money(Number(x.q)*Number(x.price)*(cur==="EUR"?1:rate))}</td><td class="xcol no-print"><button class="del" onclick="deleteItem(${i})">×</button></td></tr>`).join("");
+}
+function renderBDT(){ $("bdtBody").innerHTML=bdtItems.map((x,i)=>`<tr><td class="num">${i+1}</td><td><input value="${esc(x.d)}" onchange="bdtItems[${i}].d=this.value"></td><td><input type="number" value="${x.q}" min="0" step="any" onchange="bdtItems[${i}].q=this.value;renderAll()"></td><td><input value="${esc(x.u)}" onchange="bdtItems[${i}].u=this.value"></td><td><input type="number" value="${x.price}" min="0" step="0.01" onchange="bdtItems[${i}].price=this.value;renderAll()"></td><td class="total">${money(Number(x.q)*Number(x.price))}</td><td class="xcol no-print"><button class="del" onclick="bdtItems.splice(${i},1);renderAll()">×</button></td></tr>`).join("")}
+function renderTerms(){ $("terms").innerHTML=terms.map((t,i)=>`<div class="term-row"><b>${i+1}.</b><input value="${esc(t)}" onchange="terms[${i}]=this.value"><button class="term-del no-print" onclick="terms.splice(${i},1);renderTerms()">×</button></div>`).join("")}
+function renderAll(){
+ syncTop();renderItems();renderBDT();renderTerms();
+ const rate=Number($("rate").value)||1,cur=$("currency").value;
+ document.querySelectorAll(".curLabel").forEach(e=>e.textContent=cur);
+ const sub=items.reduce((s,x)=>s+Number(x.q)*Number(x.price),0);
+ const freight=Number($("freight").value)||0;const total=sub+freight;
+ $("subtotal").textContent=money(cur==="EUR"?sub:sub*rate);$("grandtotal").textContent=money(cur==="EUR"?total:total*rate);
+ $("words").textContent=numWords(cur==="EUR"?total:total*rate)+(cur==="EUR"?" EURO ONLY.":" BDT ONLY.");
+ const bs=bdtItems.reduce((s,x)=>s+Number(x.q)*Number(x.price),0);$("bdtSubtotal").textContent=money(bs);$("bdtTotal").textContent=money(bs);$("bdtWords").textContent=numWords(bs)+" ONLY.";
+ localStorage.setItem("lpslDraft",JSON.stringify({items,bdtItems,terms,fields:getFields(),freight:$("freight").value,currency:cur,rate:$("rate").value,logo:$("logo").src||""}));
+}
+function getFields(){let o={};["qno","date","brand","model","unit","rh","company","customerName","customerAddress","subject","companyContact"].forEach(k=>o[k]=$(k).value);return o}
+function setFields(o){Object.entries(o||{}).forEach(([k,v])=>{if($(k))$(k).value=v});}
+function deleteItem(i){items.splice(i,1);renderAll()}
+function addItem(){items.push({d:"NEW ITEM",p:"",q:1,u:"PCS",w:0,price:0});renderAll()}
+function addBDT(){bdtItems.push({d:"NEW SERVICE / ITEM",q:1,u:"JOB",price:0});renderAll()}
+function addTerm(){terms.push("New term : ");renderTerms()}
+function saveData(){renderAll();alert("Quotation saved in this browser's Local Storage.")}
+function loadData(){let x=localStorage.getItem("lpslDraft");if(!x)return alert("No saved quotation found.");x=JSON.parse(x);items=x.items||[];bdtItems=x.bdtItems||[];terms=x.terms||[];setFields(x.fields);$("freight").value=x.freight||0;$("currency").value=x.currency||"EUR";$("rate").value=x.rate||130;if(x.logo){$("logo").src=x.logo;$("logo").style.display="block";$("logoPlaceholder").style.display="none"}renderAll()}
+function clearAll(){if(confirm("Clear the current quotation?")){localStorage.removeItem("lpslDraft");newQuotation()}}
+function newQuotation(){items=[];bdtItems=[];terms=["Delivery Time : ","Payment Terms : ","Port of shipment : ","Port of discharge : ","Offer Validity : ","Partial shipment : ","Transshipment : "];$("freight").value=0;let d=new Date().toISOString().slice(0,10);setFields({qno:"LPSL/Q/2026-001",date:d,brand:"",model:"",unit:"",rh:"",company:"LIMBURG POWER SOLUTIONS LTD.",customerName:"",customerAddress:"",subject:"Quotation of required spare parts / services.",companyContact:"Professional Generator & Engine Solutions"});renderAll()}
+function loadLogo(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{$("logo").src=r.result;$("logo").style.display="block";$("logoPlaceholder").style.display="none";localStorage.setItem("lpslLogo",r.result)};r.readAsDataURL(f)}
+document.querySelectorAll("#qno,#date,#brand,#model,#unit,#rh,#company,#customerName,#customerAddress,#subject,#companyContact,#freight").forEach(e=>e.addEventListener("input",renderAll));
+["qnoView","dateView","brandView","modelView","unitView","rhView","customerNameView","customerAddressView","subjectView"].forEach(id=>$(id).addEventListener("input",e=>{let base=id.replace("View","");if($(base)){$(base).value=e.target.value;renderAll()}}));
+newQuotation();let savedLogo=localStorage.getItem("lpslLogo");if(savedLogo){$("logo").src=savedLogo;$("logo").style.display="block";$("logoPlaceholder").style.display="none"}renderAll();
+</script>
+</body>
+</html>
